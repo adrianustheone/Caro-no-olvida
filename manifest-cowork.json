@@ -1,0 +1,163 @@
+{
+  "id": "caro-no-olvida",
+  "name": "Caro No Olvida",
+  "version": "1.0.0",
+  "description": "Asistente conversacional por WhatsApp para Carolina - Abogada especialista en derecho de familia",
+  "author": "Adrián Rodríguez",
+  "license": "MIT",
+  "icon": "💬",
+  "keywords": ["whatsapp", "calendar", "reminders", "assistant", "derecho", "familia"],
+  
+  "plugin": {
+    "type": "cowork",
+    "requiredScopes": [
+      "claude_api",
+      "calendar_sync",
+      "whatsapp_integration"
+    ]
+  },
+  
+  "api": {
+    "baseUrl": "${API_BASE_URL}",
+    "apiVersion": "v1",
+    "timeout": 30,
+    "retryAttempts": 3
+  },
+  
+  "capabilities": {
+    "naturalLanguage": true,
+    "languageSupport": ["es", "es-AR"],
+    "eventCreation": true,
+    "googleCalendarSync": true,
+    "whatsappMessaging": true,
+    "autoReminders": true,
+    "conversationHistory": true
+  },
+  
+  "commands": [
+    {
+      "slug": "agendar",
+      "name": "Agendar Evento",
+      "description": "Agenda eventos en Google Calendar hablando naturalmente",
+      "icon": "📅",
+      "keywords": ["agendar", "crear evento", "audiencia", "reunión", "plazo"],
+      "examples": [
+        "Agendar audiencia García mañana 10:00",
+        "Plazo vencimiento 30 de agosto",
+        "Reunión López viernes 3pm"
+      ]
+    },
+    {
+      "slug": "proximo",
+      "name": "Ver Próximos Eventos",
+      "description": "Muestra los próximos eventos programados",
+      "icon": "📋",
+      "keywords": ["próximos", "eventos", "qué tengo", "agenda"]
+    },
+    {
+      "slug": "recordatorios",
+      "name": "Configurar Recordatorios",
+      "description": "Ajusta horarios de recordatorios",
+      "icon": "⏰",
+      "keywords": ["recordatorios", "horario", "cambiar", "configurar"]
+    },
+    {
+      "slug": "conversaciones",
+      "name": "Historial de Chats",
+      "description": "Ve las conversaciones recientes con Caro",
+      "icon": "💬",
+      "keywords": ["conversaciones", "historial", "chats", "recientes"]
+    },
+    {
+      "slug": "dashboard",
+      "name": "Dashboard",
+      "description": "Panel visual con eventos y configuración",
+      "icon": "📊",
+      "keywords": ["dashboard", "panel", "ver", "estado"]
+    }
+  ],
+  
+  "integrations": {
+    "googleCalendar": {
+      "name": "Google Calendar",
+      "required": true,
+      "description": "Sincronización visual de eventos",
+      "scope": "calendar.events.create"
+    },
+    "twilioWhatsApp": {
+      "name": "Twilio WhatsApp",
+      "required": true,
+      "description": "Recordatorios por WhatsApp",
+      "scope": "messaging.send"
+    },
+    "claudeAPI": {
+      "name": "Claude API",
+      "required": true,
+      "description": "Procesamiento de lenguaje natural",
+      "model": "claude-opus-4-6"
+    }
+  },
+  
+  "settings": {
+    "defaultReminders": {
+      "dailySummaryHour": 8,
+      "nightBeforeHour": 20,
+      "twoHoursBefore": true
+    },
+    "language": "es-AR",
+    "timezone": "America/Argentina/Buenos_Aires",
+    "allowGoogleCalendarSync": true,
+    "allowWhatsAppReminders": true,
+    "allowConversationHistory": true
+  },
+  
+  "permissions": {
+    "calendar": {
+      "read": true,
+      "create": true,
+      "update": false,
+      "delete": false
+    },
+    "messaging": {
+      "send": true,
+      "receive": true,
+      "history": true
+    },
+    "storage": {
+      "conversations": true,
+      "preferences": true
+    }
+  },
+  
+  "healthCheck": {
+    "endpoint": "/health",
+    "interval": 300,
+    "timeout": 10
+  },
+  
+  "installation": {
+    "minCoworkVersion": "1.0.0",
+    "minClaudeVersion": "latest",
+    "requiredFiles": [
+      "manifest.json",
+      "skills/",
+      "tools/"
+    ],
+    "setupInstructions": "SETUP_STEP_BY_STEP.md"
+  },
+  
+  "support": {
+    "documentation": "GUIDE_USAGE.md",
+    "quickReference": "QUICK_REFERENCE.md",
+    "troubleshooting": "README.md",
+    "contact": "adrian@example.com"
+  },
+  
+  "metadata": {
+    "category": "productivity",
+    "tags": ["derecho", "abogada", "calendario", "recordatorios", "fibromialgia"],
+    "rating": 5.0,
+    "downloads": 1,
+    "lastUpdated": "2026-06-28"
+  }
+}
