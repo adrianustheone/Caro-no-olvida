@@ -1,0 +1,15 @@
+{
+  "id": "caro-no-olvida",
+  "name": "Caro No Olvida",
+  "version": "1.0.0",
+  "description": "Asistente conversacional para abogadas - Agendar eventos, recordatorios automáticos",
+  "icon": "💬",
+  "author": "Adrián Rodríguez",
+  "commands": [
+    {"name": "Agendar", "slug": "agendar", "icon": "📅"},
+    {"name": "Ver Próximos", "slug": "proximo", "icon": "📋"},
+    {"name": "Recordatorios", "slug": "recordatorios", "icon": "⏰"},
+    {"name": "Conversaciones", "slug": "conversaciones", "icon": "💬"},
+    {"name": "Dashboard", "slug": "dashboard", "icon": "📊"}
+  ]
+}
