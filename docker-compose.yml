@@ -1,0 +1,103 @@
+version: '3.8'
+
+services:
+  # PostgreSQL - Base de datos
+  postgres:
+    image: postgres:15-alpine
+    container_name: carolina_postgres
+    environment:
+      POSTGRES_USER: carolina
+      POSTGRES_PASSWORD: carolina_password
+      POSTGRES_DB: carolina_reminder
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carolina"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis - Para Celery
+  redis:
+    image: redis:7-alpine
+    container_name: carolina_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI Backend
+  backend:
+    build: .
+    container_name: carolina_backend
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://carolina:carolina_password@postgres:5432/carolina_reminder
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: http://localhost:8000/api/v1/auth/google/callback
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_WHATSAPP_FROM: whatsapp:+14155552671
+      DEBUG: "True"
+    volumes:
+      - .:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Celery Worker
+  celery_worker:
+    build: .
+    container_name: carolina_celery_worker
+    command: celery -A tasks worker --loglevel=info
+    environment:
+      DATABASE_URL: postgresql://carolina:carolina_password@postgres:5432/carolina_reminder
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_WHATSAPP_FROM: whatsapp:+14155552671
+    depends_on:
+      - postgres
+      - redis
+      - backend
+
+  # Celery Beat (Scheduler)
+  celery_beat:
+    build: .
+    container_name: carolina_celery_beat
+    command: celery -A tasks beat --loglevel=info
+    environment:
+      DATABASE_URL: postgresql://carolina:carolina_password@postgres:5432/carolina_reminder
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_WHATSAPP_FROM: whatsapp:+14155552671
+    depends_on:
+      - postgres
+      - redis
+      - backend
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: carolina_network
